@@ -3,7 +3,7 @@
 
 use Phinx\Migration\AbstractMigration;
 
-class CreateTableTeam extends AbstractMigration
+class CreateTableTeams extends AbstractMigration
 {
   public function change()
   {
@@ -17,7 +17,7 @@ class CreateTableTeam extends AbstractMigration
       ->addColumn('team_id', 'string')
       ->addColumn('player_id', 'string')
       ->addForeignKey('team_id', 'teams', 'id')
-      ->addForeignKey('player_id', 'player', 'id')
+      ->addForeignKey('player_id', 'players', 'id')
       ->create();
   }
 }

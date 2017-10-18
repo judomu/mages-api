@@ -1,7 +1,7 @@
 <?php
 
-if (file_exists(__DIR__ . '/../config.php')) {
-  require_once(__DIR__ . '/../config.php');
+if (file_exists(__DIR__ . '/config.php')) {
+  require_once(__DIR__ . '/config.php');
 } else {
   die('Base config file "config.php" missing.');
 }
