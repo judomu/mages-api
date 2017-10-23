@@ -5,7 +5,11 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 
 $app->post('/api/player', function (Request $request, Response $response, $args) {
-  $newPlayer = $this->playerApplicationService->createPlayer('bla');
+  $data = $request->getParsedBody();
+
+  $newPlayer = $this->playerApplicationService->createPlayer($data['username'], $data['password'],
+    $data['alias'], $data['fullname']);
+
   return $response->withJson($newPlayer);
 });
 

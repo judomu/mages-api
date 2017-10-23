@@ -15,10 +15,9 @@ class PlayerApplicationService
     $this->containerService = $cs;
   }
 
-  public function createPlayer(string $username)
+  public function createPlayer(string $username, string $password, string $alias, string $fullname)
   {
-    $player = new Player;
-    $player->setUsername($username);
+    $player = new Player($username, $password, $alias, $fullname);
 
     $player->save();
 
