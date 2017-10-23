@@ -2,7 +2,7 @@
 
 namespace Mages;
 
-
+use InvalidArgumentException;
 use Illuminate\Database\Eloquent\Model;
 use Ramsey\Uuid\Uuid;
 
