@@ -16,15 +16,20 @@ class Player extends Model
 
   public $keyType = 'string';
 
-
-  function __construct(string $username, string $password, string $alias = null, string $fullname = null)
-  {
+  function __construct() {
     $this->id = Uuid::getFactory()->uuid4();
+  }
 
-    $this->setUsername($username);
-    $this->setPassword($password);
-    $this->setAlias($alias);
-    $this->setFullname($fullname);
+  static function createPlayer(string $username, string $password, string $alias = null, string $fullname = null)
+  {
+    $player = new self;
+
+    $player->setUsername($username);
+    $player->setPassword($password);
+    $player->setAlias($alias);
+    $player->setFullname($fullname);
+
+    return $player;
   }
 
   public function getId()
