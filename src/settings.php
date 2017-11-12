@@ -34,6 +34,12 @@ return [
       'charset' => DB_CHARSET,
       'collation' => 'utf8_unicode_ci',
       'prefix' => '',
+    ],
+
+    // Files settings
+    'files' => [
+      'folder' => 'uploads',
+      'folder_path' => __DIR__ .'/../uploads/'
     ]
   ],
 ];

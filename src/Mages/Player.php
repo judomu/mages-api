@@ -9,8 +9,11 @@ use Ramsey\Uuid\Uuid;
 class Player extends Model
 {
   // private $id;
-
   // private $username;
+  // private $password;
+  // private $alias;
+  // private $fullname;
+  // private $avatarUrl;
 
   public $incrementing = false;
 
