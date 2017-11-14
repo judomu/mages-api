@@ -13,7 +13,7 @@ class Player extends Model
   // private $password;
   // private $alias;
   // private $fullname;
-  // private $avatarUrl;
+  // private $avatar;
 
   public $incrementing = false;
 
@@ -77,6 +77,14 @@ class Player extends Model
 
   public function getPassword() {
     return $this->password;
+  }
+
+  public function setAvatar(string $avatar) {
+    $this->avatar = $avatar;
+  }
+
+  public function getAvatar() {
+    return $this->avatar;
   }
 
   public function jsonSerialize()

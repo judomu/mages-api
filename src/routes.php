@@ -3,7 +3,6 @@
 
 use Slim\Http\Request;
 use Slim\Http\Response;
-use Sirius\Upload\Handler as UploadHandler;
 
 $app->post('/api/player', function (Request $request, Response $response, $args) use ($app) {
   $data = $request->getParsedBody();
@@ -14,26 +13,10 @@ $app->post('/api/player', function (Request $request, Response $response, $args)
   return $response->withJson($newPlayer);
 });
 
-$app->post('/api/player/{id}/avatar', function (Request $request, Response $response, $args) use ($app) {
-  $uploadHandler = new UploadHandler($app->getContainer()->get('settings')['files']['folder_path']);
-  $uploadHandler->addRule('image', ['allowed' => ['jpg', 'jpeg', 'png']],
-    '{label} must be a valid image (jpg, jpeg, png)', 'Avatar');
-  $uploadHandler->addRule('size', ['max' => '512K'],
-    '{label} must have less than {max}', 'Avatar');
-  $uploadHandler->addRule('imageratio', ['ratio' => '1:1'],
-    '{label} must be a square image', 'Avatar');
-  $uploadHandler->addRule('imagewidth', ['min' => 100, 'max' => 200],
-    '{label} must be at least {min} pixels wide and max {max} wide', 'Avatar');
-  $uploadHandler->addRule('imageheight', ['min' => 100, 'max' => 200],
-    '{label} must be at least {min} pixels tall and max {max} tall', 'Avatar');
+$app->post('/api/player/{id}/avatar', function (Request $request, Response $response, $args) {
+  $player = $this->playerApplicationService->attachAvatar($args['id'], $_FILES['avatar']);
 
-  $result = $uploadHandler->process($_FILES['avatar']);
-
-  if ($result->isValid()) {
-    echo $app->getContainer()->get('settings')['files']['folder'] . '/' . $result->name;
-  } else {
-    throw new InvalidArgumentException(implode(', ', $result->getMessages()));
-  }
+  return $response->withJson($player);
 });
 
 $app->get('/api/player/{id}', function (Request $request, Response $response, $args) {

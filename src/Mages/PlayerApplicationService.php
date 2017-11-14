@@ -6,6 +6,7 @@ namespace Mages;
 use Illuminate\Database\Query\Builder;
 use Mages\Player;
 use Ramsey\Uuid\Uuid;
+use Sirius\Upload\Handler as UploadHandler;
 
 class PlayerApplicationService
 {
@@ -18,7 +19,7 @@ class PlayerApplicationService
 
   public function createPlayer(string $username, string $password, string $alias, string $fullname)
   {
-    if(sizeof(Player::query()->where('username', $username)->get()) != 0){
+    if (sizeof(Player::query()->where('username', $username)->get()) != 0) {
       throw new \InvalidArgumentException('User already exists');
     }
 
@@ -29,7 +30,52 @@ class PlayerApplicationService
     return $player;
   }
 
-  public function getPlayer($id)
+  public function attachAvatar(string $playerId, array $avatar)
+  {
+    $uploadHandler = new UploadHandler($this->containerService->get('settings')['files']['folder_path']);
+
+    // Define validation ruleset
+    $uploadHandler->addRule('image', ['allowed' => ['jpg', 'jpeg', 'png']],
+      '{label} must be a valid image (jpg, jpeg, png)', 'Avatar');
+    $uploadHandler->addRule('size', ['max' => '512K'],
+      '{label} must have less than {max}', 'Avatar');
+    $uploadHandler->addRule('imageratio', ['ratio' => '1:1'],
+      '{label} must be a square image', 'Avatar');
+    $uploadHandler->addRule('imagewidth', ['min' => 100, 'max' => 200],
+      '{label} must be at least {min} pixels wide and max {max} wide', 'Avatar');
+    $uploadHandler->addRule('imageheight', ['min' => 100, 'max' => 200],
+      '{label} must be at least {min} pixels tall and max {max} tall', 'Avatar');
+
+    // Use UUID for avatar name
+    $uploadHandler->setSanitizerCallback(function ($name) {
+      $extension = strtolower(substr($name, strrpos($name, '.') + 1, 10));
+      return Uuid::uuid4() . '.' . $extension;
+    });
+
+    $result = $uploadHandler->process($avatar);
+
+    if ($result->isValid()) {
+      // Construct the full avatar URL => the coupling between the application service and
+      // the web layer is a smell, should be avoided in future.
+      $avatar = 'http://' . $_SERVER['HTTP_HOST'] . '/' .
+        $this->containerService->get('settings')['files']['public_folder'] . '/' .
+        $result->name;
+
+      $player = $this->getPlayer($playerId);
+      $player->setAvatar($avatar);
+
+      $player->save();
+
+      $result->confirm();
+
+      return $player;
+    } else {
+      // Validation of uploaded avatar failed
+      throw new InvalidArgumentException(implode(', ', $result->getMessages()));
+    }
+  }
+
+  public function getPlayer(string $id)
   {
     return Player::query()
       ->with('teams')

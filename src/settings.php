@@ -38,8 +38,8 @@ return [
 
     // Files settings
     'files' => [
-      'folder' => 'uploads',
-      'folder_path' => __DIR__ .'/../uploads/'
+      'public_folder' => 'uploads',
+      'folder_path' => __DIR__ .'/../public/uploads/'
     ]
   ],
 ];
