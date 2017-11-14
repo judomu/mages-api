@@ -87,6 +87,10 @@ class Player extends Model
     return $this->avatar;
   }
 
+  public function getAvatarFileName() {
+    return $this->getAvatar() != null ? basename($this->getAvatar()) : null;
+  }
+
   public function jsonSerialize()
   {
     return array_diff_key(parent::jsonSerialize(), array_flip((array) 'password'));

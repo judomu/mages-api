@@ -3,6 +3,8 @@
 namespace Mages;
 
 
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Mages\Player;
 use Ramsey\Uuid\Uuid;
@@ -32,7 +34,8 @@ class PlayerApplicationService
 
   public function attachAvatar(string $playerId, array $avatar)
   {
-    $uploadHandler = new UploadHandler($this->containerService->get('settings')['files']['folder_path']);
+    $folderPath = $this->containerService->get('settings')['files']['folder_path'];
+    $uploadHandler = new UploadHandler($folderPath);
 
     // Define validation ruleset
     $uploadHandler->addRule('image', ['allowed' => ['jpg', 'jpeg', 'png']],
@@ -62,9 +65,15 @@ class PlayerApplicationService
         $result->name;
 
       $player = $this->getPlayer($playerId);
+      $oldAvatar = $player->getAvatarFileName();
       $player->setAvatar($avatar);
 
       $player->save();
+
+      // Remove old avatar if existent
+      if ($oldAvatar != null) {
+        unlink($folderPath . $oldAvatar);
+      }
 
       $result->confirm();
 
@@ -73,6 +82,15 @@ class PlayerApplicationService
       // Validation of uploaded avatar failed
       throw new InvalidArgumentException(implode(', ', $result->getMessages()));
     }
+  }
+
+  public function getPlayers(int $perPage = 5, int $page = 1)
+  {
+    return Player::query()
+      ->with('teams')
+      ->with('teams.players')
+      ->orderBy('created_at', 'desc')
+      ->simplePaginate($perPage, ['id', 'username'], 'page', $page);
   }
 
   public function getPlayer(string $id)
