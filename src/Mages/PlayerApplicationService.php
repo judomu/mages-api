@@ -6,6 +6,7 @@ namespace Mages;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
+use InvalidArgumentException;
 use Mages\Player;
 use Ramsey\Uuid\Uuid;
 use Sirius\Upload\Handler as UploadHandler;
